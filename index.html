@@ -1,0 +1,943 @@
+<!DOCTYPE html>  
+<html lang="ar">  
+<head>  
+<meta charset="UTF-8">  
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>Diaa Market</title>  
+<style>  
+body{  
+    margin:0;  
+    font-family:Arial;  
+    color:white;  
+    background:url('https://images.unsplash.com/photo-1587049352851-8d4e89133924') no-repeat center center fixed;    
+    background-size:cover;    
+}    
+.overlay{
+    background:rgba(0,0,0,0.75);
+    min-height:100vh;
+}
+
+/* header */  
+header{
+    text-align:center;
+    padding:20px;
+    color:#f5c542;
+    font-size:28px;
+    font-weight:bold;
+    position:relative;
+    text-shadow:2px 2px 6px black;
+}
+  
+/* nav */  
+.nav{  
+    display:flex;  
+    background:#111;  
+}  
+  
+.nav button{  
+    flex:1;  
+    padding:12px;  
+    border:none;  
+    background:#222;  
+    color:white;  
+    cursor:pointer;  
+}  
+  
+.nav button.activeTab{  
+    background:#f5c542;  
+    color:black;  
+}  
+  
+/* sections */  
+.section{display:none;padding:15px;}  
+.active{display:block;}  
+  
+/* cards */
+.card{  
+    background:rgba(28,28,28,0.9);  
+    margin:10px 0;  
+    padding:12px;  
+    border-left:4px solid #f5c542;  
+    border-radius:10px;  
+}  
+  
+.card img{  
+    width:100%;  
+    max-height:180px;  
+    object-fit:contain;  
+    border-radius:10px;  
+}  
+  
+/* product page */  
+#productPage{  
+    position:fixed;  
+    top:0;  
+    left:0;  
+    width:100%;  
+    height:100vh;  
+    background:white;  
+    color:black;  
+    z-index:9999;  
+    display:none;  
+    overflow:auto;  
+    padding:15px;  
+} 
+  
+.productImg{  
+    width:100%;  
+    height:30vh;   
+    object-fit:contain;  
+    background:#f2f2f2;  
+    border-radius:12px;  
+}  
+  
+.top-back{  
+    position:absolute;  
+    top:15px;  
+    left:15px;  
+    width:45px;  
+    height:45px;  
+    border-radius:50%;  
+    border:none;  
+    background:#222;  
+    color:white;  
+}  
+  
+.productFooter{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:white;
+    padding:12px;
+    border-top:1px solid #ddd;
+}
+  
+.qtyBox button{  
+    font-size:20px;  
+    padding:10px 15px;  
+}  
+  
+.buy{  
+    width:100%;  
+    padding:14px;  
+    font-size:18px;  
+    border-radius:10px;  
+}  
+
+.addCartBtn{  
+    display:flex;  
+    justify-content:center;  
+    align-items:center;  
+    text-align:center;  
+    width:80%;  
+}  
+
+.productWrap{  
+    max-width:500px;  
+    margin:auto;  
+    padding:15px;  
+}  
+  
+#pImg{  
+    width:100%;  
+    height:30vh;  
+    object-fit:contain;  
+    background:#f2f2f2;  
+    border-radius:12px;  
+}  
+  
+#pName{  
+    font-size:22px;  
+    font-weight:bold;  
+    margin-top:15px;  
+    color:#111;  
+}  
+  
+#pDesc{  
+    margin-top:10px;  
+    font-size:16px;  
+    line-height:1.6;  
+    color:#333;  
+}  
+  
+#pPrice{  
+    font-size:18px;  
+    font-weight:bold;  
+    color:#000;  
+}  
+  
+.qtyBox{  
+    display:flex;  
+    justify-content:center;  
+    align-items:center;  
+    gap:10px;  
+    margin-bottom:10px;  
+}  
+  
+.qtyBox button{  
+    font-size:18px;  
+    padding:8px 12px;  
+}  
+  
+.buy{  
+    width:100%;  
+    padding:14px;  
+    font-size:18px;  
+    border-radius:10px;  
+    background:#25D366;  
+    color:white;  
+    border:none;  
+} 
+
+.searchContainer{
+    position:sticky;
+    top:0;
+    z-index:100;
+    padding:10px;
+    background:#111;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+#searchBox{
+    width:100%;
+    box-sizing:border-box;
+    height:48px;
+    border-radius:50px;
+    border:2px solid #f5c542;
+    padding:0 20px;
+    font-size:16px;
+    background:white;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+    outline:none;
+}
+
+#searchBox:focus{
+    border-color:#25D366;
+}
+
+.toast{
+    position:fixed;
+    bottom:100px;
+    left:50%;
+    transform:translateX(-50%);
+    background:white;
+    color:black;
+    border:2px solid #f5c542;
+    padding:12px 35px;
+    border-radius:40px;
+    display:none;
+    z-index:99999;
+    box-shadow:0 2px 10px rgba(0,0,0,.3);
+}
+
+#newName,
+#newPrice,
+#newDesc,
+#newCategory,
+#adminPass{
+    width:100%;
+    padding:14px;
+    margin:10px 0;
+    border-radius:10px;
+    border:none;
+    box-sizing:border-box;
+    font-size:16px;
+}
+
+.buy,
+button{
+    transition:0.2s;
+}
+
+.buy:active,
+button:active{
+    transform:scale(0.96);
+}
+
+#info a{
+    color:white;
+    text-decoration:none;
+}
+
+#cartBadge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    background:#f5c542;
+    color:black;
+    padding:8px 14px;
+    border-radius:25px;
+    font-weight:bold;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+#deleteConfirm{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100vh;
+    background:rgba(0,0,0,0.6);
+    justify-content:center;
+    align-items:center;
+    z-index:999999;
+    animation:fadeIn 0.2s ease;
+}
+
+#deleteConfirm .box{
+    background:white;
+    color:black;
+    padding:20px;
+    border-radius:15px;
+    width:80%;
+    max-width:320px;
+    text-align:center;
+    animation:pop 0.2s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+@keyframes pop{
+    from{transform:scale(0.8);}
+    to{transform:scale(1);}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head> 
+<body>  
+<div class="overlay">
+<header>
+<img
+src="https://i.ibb.co/XrBdcW4D/copilot-image-1782756388664.png"
+onclick="secretAdmin()"
+style="
+width:120px;
+height:120px;
+border-radius:50%;
+border:4px solid #f5c542;
+object-fit:cover;
+cursor:pointer;
+">
+<div style="font-size:22px; margin-top:5px;">
+🍯 Diaa Market
+</div>
+</header>
+<audio id="clickSound" src="https://www.soundjay.com/buttons/button-16.mp3"></audio>
+
+<div class="toast" id="toast">تمت الإضافة إلى السلة ✓</div>
+
+<div id="editPage" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:white;color:black;z-index:99999;overflow:auto;padding:20px;">
+    <button class="top-back" onclick="closeEditPage()">⬅</button>
+    <h2>تعديل المنتج</h2>
+    <input id="editName" placeholder="اسم المنتج" style="width:95%;padding:12px;margin:10px 0;">
+    <input id="editPrice" type="number" placeholder="السعر" style="width:95%;padding:12px;margin:10px 0;">
+    <textarea id="editDesc" placeholder="الوصف" style="width:95%;padding:12px;margin:10px 0;height:120px;"></textarea>
+    <select id="editCategory" style="width:95%;padding:12px;margin:10px 0;">
+        <option value="honey">العسل</option>
+        <option value="pollen">حبوب اللقاح</option>
+        <option value="royal">غذاء الملكات</option>
+    </select>
+    <button class="buy" onclick="saveEdit()">حفظ التعديلات</button>
+</div>
+
+<div class="nav"> 
+    <button id="tab-admin" onclick="show('admin','tab-admin')" style="display:none;">الإدارة</button>
+    <button id="tab-home" onclick="show('home','tab-home')">الرئيسية</button>  
+    <button id="tab-categories" onclick="show('categories','tab-categories')">المنتجات</button>  
+    <button id="tab-cart" onclick="showCart()">السلة</button>  
+    <button id="tab-info" onclick="show('info','tab-info')">معلومات</button>  
+</div>
+    
+<div id="home" class="section active">
+    <div class="searchContainer">
+        <input id="searchBox" type="text" placeholder="🔍 ابحث عن منتجات العسل..." onkeyup="searchProducts()">
+    </div>
+    <div id="cartBadge">🛒 السلة: <span id="cartCount">0</span></div>
+    <div id="homeProducts"></div>
+</div>
+    
+<div id="categories" class="section">  
+    <div class="card" onclick="show('honey','tab-categories')">🍯 العسل</div>  
+    <div class="card" onclick="show('pollen','tab-categories')">🌼 حبوب اللقاح</div>  
+    <div class="card" onclick="show('royal','tab-categories')">👑 غذاء الملكات</div>  
+</div>
+    
+<div id="honey" class="section">
+    <button class="buy" style="width:60px;margin-bottom:10px;" onclick="show('categories','tab-categories')">«</button>
+    <div id="honeyProducts"></div>
+</div>   
+
+<div id="pollen" class="section">
+    <button class="buy" style="width:60px;margin-bottom:10px;" onclick="show('categories','tab-categories')">«</button>
+    <div id="pollenProducts"></div>
+</div>
+  
+<div id="royal" class="section">
+    <button class="buy" style="width:60px;margin-bottom:10px;" onclick="show('categories','tab-categories')">«</button>
+    <div id="royalProducts"></div>
+</div> 
+
+<div id="info" class="section">
+    <div class="card">
+        <h3>عن المتجر</h3>
+        <p>منتجات طبيعية 100% من مناحل (عسلنا من منحلنا) في لبنان 🇱🇧</p>
+    </div>
+    <div class="card">
+        <h3>م مواقع التواصل</h3>
+        <p><a href="#" target="_blank">🎵 TikTok</a></p>
+    </div>
+    <div class="card">
+        <h3>التواصل</h3>
+        <div style="margin:10px 0;">
+            <a href="tel:+96181723480" style="display:block;background:#25D366;color:white;padding:12px;border-radius:10px;text-align:center;text-decoration:none;">📞 اضغط للاتصال</a>
+        </div>
+        <div style="margin:10px 0;">
+            <a href="https://wa.me/96181723480" target="_blank" style="display:block;background:#128C7E;color:white;padding:12px;border-radius:10px;text-align:center;text-decoration:none;">💬 اضغط للتواصل عبر واتساب</a>
+        </div>
+    </div>
+</div>
+
+<div id="admin" class="section">
+    <div id="adminLogin" class="card">
+        <h3>تسجيل دخول الإدارة</h3>
+        <input id="adminPass" type="password" placeholder="أدخل كلمة المرور">
+        <button class="buy" onclick="checkAdmin()">دخول</button>
+    </div>
+    <div id="adminPanel" style="display:none;">
+        <div style="display:flex;margin-bottom:15px;gap:10px;">
+            <button id="adminProductsTab" class="buy" onclick="showAdminSection('productsAdmin','adminProductsTab')">📦 المنتجات</button>
+            <button id="adminOrdersTab" class="buy" onclick="showAdminSection('ordersAdmin','adminOrdersTab')">🛒 الطلبات</button>
+        </div>
+        <div id="productsAdmin">
+            <div id="adminProducts"></div>
+            <div class="card">
+                <h3>إضافة منتج جديد</h3>
+                <input id="newName" placeholder="اسم المنتج">
+                <input id="newPrice" type="number" placeholder="السعر">
+                <input id="newImg" type="file" accept="image/*">
+                <textarea id="newDesc" placeholder="وصف المنتج"></textarea>
+                <select id="newCategory">
+                    <option value="honey">العسل</option>
+                    <option value="pollen">حبوب اللقاح</option>
+                    <option value="royal">غذاء الملكات</option>
+                </select>
+                <button class="buy" onclick="addProduct()">إضافة المنتج</button>
+            </div>
+        </div>
+    </div>
+    <div id="ordersAdmin" style="display:none;">
+        <h3>🛒 الطلبات</h3>
+        <div id="ordersList"></div>
+    </div>
+</div> 
+
+<div id="cart" class="section">  
+    <div class="card">  
+        <h3>السلة</h3>  
+        <div id="cartItems"></div>  
+        <h3 id="total"></h3>  
+        <button class="buy" onclick="checkout()">إرسال الطلب</button>  
+    </div>  
+</div> 
+
+<div id="checkoutPage" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:white;color:black;z-index:99999;overflow:auto;padding:20px;box-sizing:border-box;">
+    <button class="top-back" onclick="closeCheckout()">⬅</button>
+    <h2 style="text-align:center;color:#f5c542;margin-top:50px;">إتمام الطلب</h2>
+    <div class="card" style="background:white;color:black;box-shadow:0 2px 10px rgba(0,0,0,.2);">
+        <p>👤 الاسم الكامل <span style="color:red;">(مطلوب)</span></p>
+        <input id="customerName" placeholder="👤 الاسم الكامل" style="width:95%;padding:15px;margin:10px 0;">
+        <p> 📞 رقم الهاتف<span style="color:red;">(مطلوب)</span></p>
+        <input id="customerPhone" placeholder="📞 رقم الهاتف" style="width:95%;padding:15px;margin:10px 0;">
+        <p>📍 المنطقة / المدينة <span style="color:red;">(مطلوب)</span></p>
+        <input id="customerCity" placeholder="📍 المنطقة / المدينة" style="width:95%;padding:15px;margin:10px 0;">
+        <p>🏠 العنوان بالتفصيل<span style="color:red;">(مطلوب)</span></p>
+        <textarea id="customerAddress" placeholder="🏠 العنوان بالتفصيل" style="width:95%;height:100px;padding:15px;margin:10px 0;"></textarea>
+        <textarea id="customerNote" placeholder="📝 ملاحظات إضافية (اختياري)" style="width:95%;height:80px;padding:15px;margin:10px 0;"></textarea>
+    </div>
+    <div class="card" style="background:white;color:black;box-shadow:0 2px 10px rgba(0,0,0,.2);">
+        <h3 style="color:#f5c542;">طريقة الدفع</h3>
+        <label><input type="radio" name="payment" value="الدفع عند الاستلام" checked> الدفع عند الاستلام</label><br><br>
+        <label><input type="radio" name="payment" value="Wish Money"> Wish Money</label>
+    </div>
+    <div class="card" id="orderSummary" style="background:white;color:black;box-shadow:0 2px 10px rgba(0,0,0,.2);">
+        <h3 style="color:#f5c542;">ملخص الطلب</h3>
+    </div>
+    <button class="buy" onclick="confirmOrder()">✅ تأكيد الطلب</button>
+</div>
+
+<div id="productPage">  
+    <button class="top-back" onclick="back()">⬅</button>  
+    <div class="productWrap">  
+        <img id="pImg" class="productImg">  
+        <div class="productName" id="pName"></div>  
+        <div class="productDesc" id="pDesc"></div>  
+        <div class="productPrice"><span id="pPrice"></span>$</div>  
+        <div class="productFooter">  
+            <div class="qtyBox">  
+                <button onclick="qty(-1)">➖</button>  
+                <span id="qty">1</span>  
+                <button onclick="qty(1)">➕</button>  
+            </div>
+            <button class="buy addCartBtn" onclick="add()">🧺 أضف إلى السلة</button>  
+        </div>  
+    </div>
+</div>
+</div>
+
+<script>
+// دالة عرض الأقسام والتنقل
+function show(id, tabId){
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    let target = document.getElementById(id);
+    if(target) target.style.display = 'block';
+    
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('activeTab'));
+    if(tabId) {
+        let tab = document.getElementById(tabId);
+        if(tab) tab.classList.add('activeTab');
+    }
+}
+
+// الروابط الحقيقية والربط المباشر بقاعدة البيانات (تم إصلاح الحرف الصغير لضمان استقرار الكود)
+
+const SUPABASE_URL = "https://brschbksrsqtkmqvssbl.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_kR6t52-yh-JRhk9gWyuvIw_gCkA2FeV";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let deleteId = null;
+let editingId = null;
+let products = [];
+let qtyValue = 1;  
+let name="", price=0, img=""; 
+
+function renderProducts(){
+    document.getElementById("homeProducts").innerHTML = "";
+    document.getElementById("adminProducts").innerHTML = "";
+    document.getElementById("honeyProducts").innerHTML = "";
+    document.getElementById("pollenProducts").innerHTML = "";
+    document.getElementById("royalProducts").innerHTML = "";
+
+    products.forEach(p => {
+        let card = `
+        <div class="card" onclick="openProduct('${p.name}',${p.price},'${p.img}','${p.desc}')">
+            <h3>${p.name}</h3>
+            <p>${p.price}$</p>
+            <img src="${p.img}">
+        </div>
+        `;
+        
+        document.getElementById("adminProducts").innerHTML += `
+        <div class="card">
+            <h3>${p.name}</h3>
+            <p>${p.price}$</p>
+            <button onclick="event.stopPropagation(); deleteProduct('${p.id}')">🗑️ حذف</button>
+            <button onclick="event.stopPropagation(); editProduct('${p.id}')">✏️ تعديل</button>
+        </div>
+        `;
+        
+        document.getElementById("homeProducts").innerHTML += card;
+
+        if(p.category === "honey"){
+            document.getElementById("honeyProducts").innerHTML += card;
+        }
+        if(p.category === "pollen"){
+            document.getElementById("pollenProducts").innerHTML += card;
+        }
+        if(p.category === "royal"){
+            document.getElementById("royalProducts").innerHTML += card;
+        }
+    });
+} 
+  
+function openProduct(n,p,i,d){  
+    name=n; price=p; img=i; qtyValue=1;  
+    document.getElementById("pName").innerText=n;  
+    document.getElementById("pPrice").innerText=p;  
+    document.getElementById("pImg").src=i;  
+    document.getElementById("pDesc").innerText=d;  
+    document.getElementById("qty").innerText=1;  
+    document.getElementById("productPage").style.display="block";  
+    document.querySelector(".nav").style.display="none";  
+}  
+  
+function back(){  
+    document.getElementById("productPage").style.display="none";  
+    document.querySelector(".nav").style.display="flex";  
+}  
+
+function qty(x){  
+    qtyValue += x;  
+    if(qtyValue < 1) qtyValue = 1;  
+    document.getElementById("qty").innerText = qtyValue;  
+}  
+  
+function add(){
+    playSound();
+    let exist = cart.find(i => i.name === name);
+    if(exist){
+        exist.qty += qtyValue;
+    }else{
+        cart.push({ name:name, price:price, img:img, qty:qtyValue });
+    }
+    showToast("تمت الإضافة إلى السلة ✓");
+    updateCart();
+    qtyValue = 1;
+    document.getElementById("qty").innerText = 1;
+    back();
+}
+
+function updateCart(){
+    let totalQty = 0;
+    cart.forEach(i=> totalQty += i.qty);
+    document.getElementById("cartCount").innerText = totalQty;
+    localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function showCart(){
+    show('cart','tab-cart');
+    let box = document.getElementById("cartItems");
+    box.innerHTML = "";
+    let total = 0;
+    cart.forEach((i,index)=>{
+        let sum = i.qty * i.price;
+        total += sum;
+        box.innerHTML += `
+        <div class="card">
+            <img src="${i.img}" style="width:80px;height:80px">
+            <h4>${i.name}</h4>
+            <p>${i.qty} × ${i.price}$ = ${sum}$</p>
+            <button onclick="changeQty(${index},-1)">➖</button>
+            <button onclick="changeQty(${index},1)">➕</button>
+            <button onclick="removeItem(${index})">🗑️ حذف</button>
+        </div>
+        `;
+    });
+    document.getElementById("total").innerText = "الإجمالي: " + total + "$";
+}
+  
+function changeQty(i,val){  
+    cart[i].qty += val;  
+    if(cart[i].qty <= 0) cart.splice(i,1);  
+    updateCart(); showCart();  
+}  
+  
+function removeItem(i){  
+    cart.splice(i,1); updateCart(); showCart();  
+}  
+  
+function checkout(){
+    if(cart.length == 0){ showToast("السلة فارغة"); return; }
+    document.getElementById("checkoutPage").style.display = "block";
+    let summary = "";
+    cart.forEach(i=> summary += `<p>${i.name} × ${i.qty}</p>`);
+    document.getElementById("orderSummary").innerHTML = `<h3 style="color:#f5c542;">ملخص الطلب</h3>${summary}`;
+}
+
+function searchProducts(){
+    let text = document.getElementById("searchBox").value.toLowerCase();
+    document.querySelectorAll("#homeProducts .card, #honeyProducts .card, #pollenProducts .card, #royalProducts .card").forEach(card=>{
+        if(card.innerText.toLowerCase().includes(text)) card.style.display="block";
+        else card.style.display="none";
+    });
+}
+
+function showToast(message){
+    let t = document.getElementById("toast");
+    t.innerText = message; t.style.display = "block";
+    setTimeout(()=> t.style.display = "none", 1500);
+}
+
+
+                async function addProduct(){
+    if(!supabaseClient) { showToast("يجب ربط مَفاتِيح سُوبَابِيس أولاً بشكل صحيح"); return; }
+    let nameInput = document.getElementById("newName");
+    let priceInput = document.getElementById("newPrice");
+    let descInput = document.getElementById("newDesc");
+
+    nameInput.style.border = "none"; priceInput.style.border = "none"; descInput.style.border = "none";
+    let error = false;
+    if(nameInput.value.trim() === ""){ nameInput.style.border = "2px solid red"; error = true; }
+    if(priceInput.value.trim() === ""){ priceInput.style.border = "2px solid red"; error = true; }
+    if(descInput.value.trim() === ""){ descInput.style.border = "2px solid red"; error = true; }
+    if(error){ showToast("يرجى تعبئة جميع الحقول المطلوبة"); return; }
+
+    let file = document.getElementById("newImg").files[0];
+    if(!file){ showToast("اختر صورة للمنتج"); return; }
+
+    let reader = new FileReader();
+    reader.onload = function(e){
+        let imgElement = new Image();
+        imgElement.src = e.target.result;
+        imgElement.onload = async function(){
+            // عملية ضغط وتصغير الصورة تلقائياً لتفادي رفض السيرفر تماماً
+            let canvas = document.createElement("canvas");
+            let max_size = 500; 
+            let width = imgElement.width;
+            let height = imgElement.height;
+            
+            if (width > height) {
+                if (width > max_size) { height *= max_size / width; width = max_size; }
+            } else {
+                if (height > max_size) { width *= max_size / height; height = max_size; }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            let ctx = canvas.getContext("2d");
+            ctx.drawImage(imgElement, 0, 0, width, height);
+            
+            let compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+
+            // إرسال البيانات المضغوطة والخفيفة الآن
+            const { data, error } = await supabaseClient
+                .from('products')
+                .insert([{
+                    name: nameInput.value,
+                    price: Number(priceInput.value),
+                    img: compressedBase64,
+                    desc: descInput.value,
+                    category: document.getElementById("newCategory").value
+                }]);
+
+            if(error) {
+                alert("فشل إضافة المنتج: " + error.message);
+            } else {
+                showToast("تمت إضافة المنتج بنجاح ✓");
+                nameInput.value=""; priceInput.value=""; descInput.value="";
+                document.getElementById("newImg").value="";
+                // تحديث قائمة المنتجات فوراً في الصفحة دون الحاجة لعمل Refresh يدوي
+                if(typeof loadProducts === "function") loadProducts(); 
+            }
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+
+function deleteProduct(id){
+    deleteId = id;
+    document.getElementById("deleteConfirm").style.display = "flex";
+}
+
+async function confirmDelete(){
+    if(!supabaseClient) return;
+    if(deleteId === null) return;
+    const { error } = await supabaseClient.from('products').delete().eq('id', deleteId);
+    if(error){
+        alert("فشل الحذف: " + error.message);
+    }else{
+        showToast("تم حذف المنتج");
+        closeDeleteConfirm();
+        deleteId = null;
+    }
+}    
+
+function closeDeleteConfirm(){ document.getElementById("deleteConfirm").style.display = "none"; }
+
+function checkAdmin(){
+    let pass = document.getElementById("adminPass").value;
+    if(pass === "1234"){
+        document.getElementById("adminLogin").style.display="none";
+        document.getElementById("adminPanel").style.display="block";
+        showAdminSection("productsAdmin", "adminProductsTab");
+        showToast("تم تسجيل الدخول");
+    }else{
+        showToast("كلمة المرور غير صحيحة");
+    }
+}
+      
+function editProduct(id){
+    let product = products.find(p => p.id == id);
+    editingId = id;
+    document.getElementById("editName").value = product.name;
+    document.getElementById("editPrice").value = product.price;
+    document.getElementById("editDesc").value = product.desc;
+    document.getElementById("editCategory").value = product.category;
+    document.getElementById("editPage").style.display = "block";
+}
+
+function closeEditPage(){ document.getElementById("editPage").style.display = "none"; }
+
+async function saveEdit(){
+    if(!supabaseClient) return;
+    let name = document.getElementById("editName").value;
+    let price = Number(document.getElementById("editPrice").value);
+    let desc = document.getElementById("editDesc").value;
+    let category = document.getElementById("editCategory").value;
+
+    const { error } = await supabaseClient.from('products').update({
+        name: name, price: price, desc: desc, category: category
+    }).eq('id', editingId);
+
+    if(error) {
+        alert("خطأ في التعديل: " + error.message);
+    } else {
+        closeEditPage();
+        showToast("تم تعديل المنتج");
+    }
+}
+
+function closeCheckout(){ document.getElementById("checkoutPage").style.display = "none"; }
+
+async function confirmOrder(){
+    playSound();
+    let name = document.getElementById("customerName").value.trim();
+    let phone = document.getElementById("customerPhone").value.trim();
+    let city = document.getElementById("customerCity").value.trim();
+    let address = document.getElementById("customerAddress").value.trim();
+    let payment = document.querySelector('input[name="payment"]:checked').value;
+
+    let error = false;
+    if(name === ""){ document.getElementById("customerName").style.border = "2px solid red"; error = true; }
+    if(phone === ""){ document.getElementById("customerPhone").style.border = "2px solid red"; error = true; }
+    if(city === ""){ document.getElementById("customerCity").style.border = "2px solid red"; error = true; }
+    if(address === ""){ document.getElementById("customerAddress").style.border = "2px solid red"; error = true; }
+
+    if(error){
+        showToast("يرجى ملء جميع الحقول الضرورية");
+        document.getElementById("checkoutPage").scrollTo({ top: 0, behavior: "smooth" });
+        return;
+    }
+
+    if(!supabaseClient){
+        sendWhatsApp(name, phone, city, address, payment);
+        return;
+    }
+
+    let orderData = {
+        name: name, phone: phone, city: city, address: address, payment: payment,
+        products: cart, status: "قيد الانتظار"
+    };
+
+    const { error: err } = await supabaseClient.from('orders').insert([orderData]);
+
+    if (err) {
+        alert("فشل حفظ الطلب: " + err.message);
+    } else {
+        sendWhatsApp(name, phone, city, address, payment);
+    }
+}
+
+function sendWhatsApp(name, phone, city, address, payment){
+    let msg = `🛒 طلب جديد\n\n👤 الاسم: ${name}\n\n📞 الهاتف: ${phone}\n\n📍 المدينة: ${city}\n\n🏠 العنوان: ${address}\n\n💳 الدفع: ${payment}\n\n📦 المنتجات:\n`;
+    cart.forEach(i=> msg += `${i.name} × ${i.qty}\n`);
+    window.open("https://api.whatsapp.com/send?phone=96181723480&text=" + encodeURIComponent(msg), "_self");
+    
+    cart = []; updateCart(); showCart(); closeCheckout();
+    showToast("تم تأكيد طلبك بنجاح ✓");
+}
+
+function showAdminSection(id, tabId){
+    document.getElementById("productsAdmin").style.display = "none";
+    document.getElementById("ordersAdmin").style.display = "none";
+    document.getElementById(id).style.display = "block";
+    document.getElementById("adminProductsTab").style.background = "#222"; document.getElementById("adminProductsTab").style.color = "white";
+    document.getElementById("adminOrdersTab").style.background = "#222"; document.getElementById("adminOrdersTab").style.color = "white";
+    document.getElementById(tabId).style.background = "white"; document.getElementById(tabId).style.color = "black";
+}
+
+function loadProducts() {
+    if(!supabaseClient) return;
+    supabaseClient.from('products').select('*').order('id', { ascending: false }).then(({ data }) => {
+        if (data) { products = data; renderProducts(); }
+    });
+
+    supabaseClient.channel('custom-filter-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+        supabaseClient.from('products').select('*').order('id', { ascending: false }).then(({ data }) => {
+            if (data) { products = data; renderProducts(); }
+        });
+    }).subscribe();
+}
+
+function renderOrders() {
+    if(!supabaseClient) return;
+    supabaseClient.from('orders').select('*').order('id', { ascending: false }).then(({ data }) => {
+        displayOrders(data || []);
+    });
+
+    supabaseClient.channel('custom-orders-channel')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+        supabaseClient.from('orders').select('*').order('id', { ascending: false }).then(({ data }) => {
+            displayOrders(data || []);
+        });
+    }).subscribe();
+}
+
+function displayOrders(ordersArray) {
+    let list = document.getElementById("ordersList");
+    list.innerHTML = "";
+    if(ordersArray.length === 0){
+        list.innerHTML = `<div class="card"><p>لا توجد طلبات حالياً</p></div>`;
+        return;
+    }
+    ordersArray.forEach((o, index) => {
+        let productsText = "";
+        if (Array.isArray(o.products)) {
+            o.products.forEach(p => productsText += `<p>${p.name} × ${p.qty}</p>`);
+        }
+        list.innerHTML += `
+        <div class="card">
+            <h3>طلب رقم ${index + 1}</h3>
+            <p><b>الاسم:</b> ${o.name}</p>
+            <p><b>الهاتف:</b> ${o.phone}</p>
+            <p><b>المدينة:</b> ${o.city}</p>
+            <p><b>العنوان:</b> ${o.address}</p>
+            <p><b>طريقة الدفع:</b> ${o.payment}</p>
+            <hr>${productsText}<hr>
+            <p><b>الحالة:</b> ${o.status}</p>
+        </div>`;
+    });
+}
+
+function playSound(){
+    let sound = document.getElementById("clickSound");
+    if(sound) { sound.currentTime = 0; sound.play().catch(()=>{}); }
+}
+
+let adminClicks = 0;
+let adminTimeout;
+function secretAdmin(){
+    clearTimeout(adminTimeout); 
+    adminClicks++;
+    
+    if(adminClicks >= 5){
+        let adminTab = document.getElementById("tab-admin");
+        if(adminTab) {
+            adminTab.style.display = "block"; 
+            show('admin', 'tab-admin'); 
+            showToast("تم فتح لوحة الإدارة بنجاح ✓");
+        }
+        adminClicks = 0;
+    }
+    adminTimeout = setTimeout(()=>{ adminClicks = 0; }, 3000);
+}
+
+// تشغيل فوري حاسم للتطبيق بالأسفل مباشرة
+show('home', 'tab-home'); 
+updateCart();
+loadProducts();
+renderOrders();
+document.getElementById("deleteConfirm").addEventListener("click", function(e){
+    if(e.target === this) closeDeleteConfirm();
+});
+</script>
+
+<div id="deleteConfirm">  
+    <div class="box">  
+        <h3>🗑️ حذف المنتج</h3>  
+        <p>هل أنت متأكد من حذف المنتج؟</p>  
+        <button class="buy" onclick="confirmDelete()">نعم</button>  
+        <br><br>
+        <button class="buy" style="background:#777" onclick="closeDeleteConfirm()">إلغاء</button>  
+    </div>    
+</div>  
+</body>  
+</html>
