@@ -925,8 +925,13 @@ show('home', 'tab-home');
 updateCart();
 loadProducts();
 renderOrders();
-document.getElementById("deleteConfirm").addEventListener("click", function(e){
-    if(e.target === this) closeDeleteConfirm();
+window.addEventListener("load", function() {
+    var el = document.getElementById("deleteConfirm");
+    if (el) {
+        el.addEventListener("click", function(e){
+            if(e.target === this) closeDeleteConfirm();
+        });
+    }
 });
 </script>
 
