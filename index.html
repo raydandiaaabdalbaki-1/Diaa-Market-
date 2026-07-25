@@ -962,7 +962,10 @@ function closeCheckout(){ document.getElementById("checkoutPage").style.display 
     btn.disabled = true;
     btn.innerText = "⏳ جاري الإرسال...";
 
+    let minDelay = new Promise(resolve => setTimeout(resolve, 900));
+
     if(!supabaseClient){
+        await minDelay;
         sendWhatsApp(name, phone, city, address, payment);
         return;
     }
@@ -972,7 +975,10 @@ function closeCheckout(){ document.getElementById("checkoutPage").style.display 
         products: cart, status: "قيد الانتظار"
     };
 
-    const { error: err } = await supabaseClient.from('orders').insert([orderData]);
+    const [{ error: err }] = await Promise.all([
+        supabaseClient.from('orders').insert([orderData]),
+        minDelay
+    ]);
 
     if (err) {
         showToast("فشل حفظ الطلب، حاول مجددًا");
