@@ -166,6 +166,28 @@ header{
     font-weight:bold;  
     color:#000;  
 }  
+ #floatingWhatsapp{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    width:60px;
+    height:60px;
+    background:#25D366;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px rgba(0,0,0,0.4);
+    z-index:9999;
+    text-decoration:none;
+    font-size:30px;
+    transition:opacity 0.3s ease, transform 0.3s ease;
+}
+#floatingWhatsapp.hideBtn{
+    opacity:0;
+    transform:scale(0.5);
+    pointer-events:none;
+}
 #splashScreen{
     position:fixed;
     top:0; left:0;
@@ -357,6 +379,7 @@ button:active{
     <p>عسل طبيعي 100% من قلب لبنان</p>
  </div>
 <div class="overlay">
+ <a id="floatingWhatsapp" href="https://wa.me/96181723480" target="_blank">💬</a>
 <header>
 <img
 src="https://i.ibb.co/XrBdcW4D/copilot-image-1782756388664.png"
@@ -783,7 +806,45 @@ async function confirmDelete(){
         deleteId = null;
     }
 }    
+window.addEventListener("load", function(){
+    var floatBtn = document.getElementById("floatingWhatsapp");
 
+    function updateFloatingButton(){
+        var currentTab = document.querySelector('.section[style*="display: block"], .section[style*="display:block"]');
+        var isAdminPage = document.getElementById("admin") && document.getElementById("admin").style.display === "block";
+        var isInfoPage = document.getElementById("info") && document.getElementById("info").style.display === "block";
+
+        if(isAdminPage){
+            floatBtn.classList.add("hideBtn");
+            return;
+        }
+
+        if(isInfoPage){
+            var contactCard = document.querySelector('#info a[href*="wa.me"]');
+            if(contactCard){
+                var rect = contactCard.getBoundingClientRect();
+                if(rect.top < window.innerHeight){
+                    floatBtn.classList.add("hideBtn");
+                } else {
+                    floatBtn.classList.remove("hideBtn");
+                }
+            }
+            return;
+        }
+
+        floatBtn.classList.remove("hideBtn");
+    }
+
+    window.addEventListener("scroll", updateFloatingButton);
+    var navButtons = document.querySelectorAll(".nav div, .nav button, .nav a");
+    navButtons.forEach(function(btn){
+        btn.addEventListener("click", function(){
+            setTimeout(updateFloatingButton, 100);
+        });
+    });
+
+    updateFloatingButton();
+});
 function closeDeleteConfirm(){ document.getElementById("deleteConfirm").style.display = "none"; }
 
 function checkAdmin(){
