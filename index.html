@@ -470,8 +470,11 @@ button:active{
         </div>
         <input id="popupName" placeholder="اسمك (اختياري)" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;box-sizing:border-box;">
         <textarea id="popupComment" placeholder="اكتب ملاحظاتك هنا..." style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;box-sizing:border-box;min-height:70px;"></textarea>
-        <button class="buy" onclick="submitPopupReview()">إرسال التقييم</button>
-        <button onclick="closeReviewPopup()" style="background:none;border:none;color:#999;margin-top:10px;cursor:pointer;">لاحقًا</button>
+        <button class="buy" id="submitReviewBtn" onclick="submitPopupReview()" style="opacity:0.5;pointer-events:none;">✅ إرسال التقييم</button>
+<div style="display:flex;gap:8px;margin-top:10px;">
+    <button onclick="postponeReviewPopup()" style="flex:1;background:#333;border:none;color:white;padding:10px;border-radius:8px;cursor:pointer;">⏳ ذكرني بعد دقيقتين</button>
+    <button onclick="closeReviewPopup()" style="flex:1;background:#333;border:none;color:white;padding:10px;border-radius:8px;cursor:pointer;">✕ لا شكرًا</button>
+</div>
     </div>
  </div>
 <div class="overlay">
