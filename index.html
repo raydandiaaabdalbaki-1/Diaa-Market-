@@ -1162,6 +1162,47 @@ window.addEventListener("load", function() {
         }
     }, 3000);
 });
+ let popupRating = 0;
+
+document.addEventListener("DOMContentLoaded", function(){
+    let stars = document.getElementById("popupStars");
+    if(stars){
+        stars.addEventListener("click", function(e){
+            let rect = stars.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            popupRating = Math.min(5, Math.ceil(x / (rect.width/5)));
+            stars.innerText = "★".repeat(popupRating) + "☆".repeat(5-popupRating);
+        });
+    }
+});
+
+function closeReviewPopup(){
+    document.getElementById("reviewPopup").style.display = "none";
+    localStorage.setItem("reviewPopupShown", "true");
+}
+
+async function submitPopupReview(){
+    if(popupRating === 0){
+        showToast("يرجى اختيار عدد النجوم");
+        return;
+    }
+    let name = document.getElementById("popupName").value.trim() || "زبون";
+    let comment = document.getElementById("popupComment").value.trim() || "بدون ملاحظات";
+
+    if(supabaseClient){
+        await supabaseClient.from('reviews').insert([{ name: name, rating: popupRating, comment: comment, approved: false }]);
+    }
+
+    showToast("شكرًا! تقييمك قيد المراجعة 🍯");
+    closeReviewPopup();
+}
+
+window.addEventListener("load", function(){
+    if(localStorage.getItem("reviewPopupShown") === "true") return;
+    setTimeout(function(){
+        document.getElementById("reviewPopup").style.display = "flex";
+    }, 90000);
+});
 </script>
 
 <div id="deleteConfirm">  
