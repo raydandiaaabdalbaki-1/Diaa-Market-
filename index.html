@@ -432,6 +432,18 @@ button:active{
 .reviewItem .stars{ color:#f5c542; font-size:16px; }
 .reviewItem .name{ font-weight:bold; margin-top:4px; }
 .reviewItem .comment{ opacity:0.85; margin-top:4px; font-size:14px; }
+  .pendingReviewItem{
+    background:#222;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+}
+.pendingReviewItem .actions{
+    display:flex; gap:8px; margin-top:8px;
+}
+.pendingReviewItem .actions button{
+    flex:1; padding:8px; border:none; border-radius:6px; cursor:pointer; color:white;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head> 
@@ -581,6 +593,7 @@ cursor:pointer;
         <div style="display:flex;margin-bottom:15px;gap:10px;">
             <button id="adminProductsTab" class="buy" onclick="showAdminSection('productsAdmin','adminProductsTab')">📦 المنتجات</button>
             <button id="adminOrdersTab" class="buy" onclick="showAdminSection('ordersAdmin','adminOrdersTab')">🛒 الطلبات</button>
+         <button id="adminReviewsTab" class="buy" onclick="showAdminSection('reviewsAdmin','adminReviewsTab')">⭐ التقييمات</button>
         </div>
         <div id="productsAdmin">
             <div id="adminProducts"></div>
@@ -604,7 +617,9 @@ cursor:pointer;
         <div id="ordersList"></div>
     </div>
 </div> 
-
+<div id="reviewsAdmin" style="display:none;">
+    <div id="pendingReviewsList"></div>
+</div>
 <div id="cart" class="section">  
     <div class="card">  
         <h3>السلة</h3>  
@@ -1057,10 +1072,13 @@ function sendWhatsApp(name, phone, city, address, payment){
 function showAdminSection(id, tabId){
     document.getElementById("productsAdmin").style.display = "none";
     document.getElementById("ordersAdmin").style.display = "none";
+    document.getElementById("reviewsAdmin").style.display = "none";
     document.getElementById(id).style.display = "block";
     document.getElementById("adminProductsTab").style.background = "#222"; document.getElementById("adminProductsTab").style.color = "white";
     document.getElementById("adminOrdersTab").style.background = "#222"; document.getElementById("adminOrdersTab").style.color = "white";
+    document.getElementById("adminReviewsTab").style.background = "#222"; document.getElementById("adminReviewsTab").style.color = "white";
     document.getElementById(tabId).style.background = "white"; document.getElementById(tabId).style.color = "black";
+    if(id === "reviewsAdmin") loadPendingReviews();
 }
 
 function loadProducts() {
@@ -1203,6 +1221,38 @@ window.addEventListener("load", function(){
         document.getElementById("reviewPopup").style.display = "flex";
     }, 90000);
 });
+async function loadPendingReviews(){
+    if(!supabaseClient) return;
+    const { data } = await supabaseClient.from('reviews').select('*').eq('approved', false).order('created_at', { ascending: false });
+    let list = document.getElementById("pendingReviewsList");
+    if(!data || data.length === 0){
+        list.innerHTML = "<p style='opacity:0.6;text-align:center;'>لا توجد تقييمات بانتظار المراجعة</p>";
+        return;
+    }
+    list.innerHTML = data.map(r => `
+        <div class="pendingReviewItem">
+            <div class="stars" style="color:#f5c542;">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>
+            <div style="font-weight:bold;margin-top:4px;">${r.name}</div>
+            <div style="opacity:0.85;margin-top:4px;font-size:14px;">${r.comment}</div>
+            <div class="actions">
+                <button style="background:#25D366;" onclick="approveReview(${r.id})">✓ نشر</button>
+                <button style="background:#e74c3c;" onclick="rejectReview(${r.id})">✕ حذف</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+async function approveReview(id){
+    await supabaseClient.from('reviews').update({ approved: true }).eq('id', id);
+    showToast("تم نشر التقييم ✓");
+    loadPendingReviews();
+}
+
+async function rejectReview(id){
+    await supabaseClient.from('reviews').delete().eq('id', id);
+    showToast("تم حذف التقييم");
+    loadPendingReviews();
+ }
 </script>
 
 <div id="deleteConfirm">  
