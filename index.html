@@ -654,7 +654,7 @@ cursor:pointer;
                 <h3>إضافة منتج جديد</h3>
                 <input id="newName" placeholder="اسم المنتج">
                 <input id="newPrice" type="number" placeholder="السعر">
-                <input id="newImg" type="file" accept="image/*">
+                <input id="newImg" type="file" accept="image/*" multiple>
                 <textarea id="newDesc" placeholder="وصف المنتج"></textarea>
                 <select id="newCategory">
                     <option value="honey">العسل</option>
@@ -913,57 +913,63 @@ function showToast(message){
     if(descInput.value.trim() === ""){ descInput.style.border = "2px solid red"; error = true; }
     if(error){ showToast("يرجى تعبئة جميع الحقول المطلوبة"); return; }
 
-    let file = document.getElementById("newImg").files[0];
-    if(!file){ showToast("اختر صورة للمنتج"); return; }
+    let files = document.getElementById("newImg").files;
+    if(!files || files.length === 0){ showToast("اختر صورة واحدة على الأقل للمنتج"); return; }
 
-    let reader = new FileReader();
-    reader.onload = function(e){
-        let imgElement = new Image();
-        imgElement.src = e.target.result;
-        imgElement.onload = async function(){
-            // عملية ضغط وتصغير الصورة تلقائياً لتفادي رفض السيرفر تماماً
-            let canvas = document.createElement("canvas");
-            let max_size = 500; 
-            let width = imgElement.width;
-            let height = imgElement.height;
-            
-            if (width > height) {
-                if (width > max_size) { height *= max_size / width; width = max_size; }
-            } else {
-                if (height > max_size) { width *= max_size / height; height = max_size; }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            let ctx = canvas.getContext("2d");
-            ctx.drawImage(imgElement, 0, 0, width, height);
-            
-            let compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+    function compressImage(file){
+        return new Promise((resolve) => {
+            let reader = new FileReader();
+            reader.onload = function(e){
+                let imgElement = new Image();
+                imgElement.src = e.target.result;
+                imgElement.onload = function(){
+                    let canvas = document.createElement("canvas");
+                    let max_size = 500;
+                    let width = imgElement.width;
+                    let height = imgElement.height;
+                    if (width > height) {
+                        if (width > max_size) { height *= max_size / width; width = max_size; }
+                    } else {
+                        if (height > max_size) { width *= max_size / height; height = max_size; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    let ctx = canvas.getContext("2d");
+                    ctx.drawImage(imgElement, 0, 0, width, height);
+                    resolve(canvas.toDataURL("image/jpeg", 0.7));
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
-            // إرسال البيانات المضغوطة والخفيفة الآن
-            const { data, error } = await supabaseClient
-                .from('products')
-                .insert([{
-                    name: nameInput.value,
-                    price: Number(priceInput.value),
-                    img: compressedBase64,
-                    desc: descInput.value,
-                    category: document.getElementById("newCategory").value
-                }]);
+    showToast("جاري رفع الصور...");
+    let compressedImages = [];
+    for(let i = 0; i < files.length; i++){
+        let compressed = await compressImage(files[i]);
+        compressedImages.push(compressed);
+    }
 
-            if(error) {
-                alert("فشل إضافة المنتج: " + error.message);
-            } else {
-                showToast("تمت إضافة المنتج بنجاح ✓");
-                nameInput.value=""; priceInput.value=""; descInput.value="";
-                document.getElementById("newImg").value="";
-                // تحديث قائمة المنتجات فوراً في الصفحة دون الحاجة لعمل Refresh يدوي
-                if(typeof loadProducts === "function") loadProducts(); 
-            }
-        }
-    };
-    reader.readAsDataURL(file);
-}
+    const { data, error: err } = await supabaseClient
+        .from('products')
+        .insert([{
+            name: nameInput.value,
+            price: Number(priceInput.value),
+            img: compressedImages[0],
+            images: compressedImages,
+            desc: descInput.value,
+            category: document.getElementById("newCategory").value
+        }]);
+
+    if(err) {
+        alert("فشل إضافة المنتج: " + err.message);
+    } else {
+        showToast("تمت إضافة المنتج بنجاح ✓");
+        nameInput.value=""; priceInput.value=""; descInput.value="";
+        document.getElementById("newImg").value="";
+        if(typeof loadProducts === "function") loadProducts();
+    }
+                }
 
 
 function deleteProduct(id){
