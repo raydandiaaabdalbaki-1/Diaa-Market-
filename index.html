@@ -422,6 +422,16 @@ button:active{
     from{transform:scale(0.8);}
     to{transform:scale(1);}
 }
+ .reviewItem{
+    background:#1a1a1a;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:10px;
+    border-right:3px solid #f5c542;
+}
+.reviewItem .stars{ color:#f5c542; font-size:16px; }
+.reviewItem .name{ font-weight:bold; margin-top:4px; }
+.reviewItem .comment{ opacity:0.85; margin-top:4px; font-size:14px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head> 
@@ -435,6 +445,17 @@ button:active{
     <div class="checkCircle">✓</div>
     <h2>تم استلام طلبك بنجاح 🎉</h2>
     <p>سنتواصل معك عبر واتساب خلال دقائق لتأكيد الطلب وتفاصيل التوصيل.</p>
+ </div>
+ <div id="reviewPopup" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:99999999;padding:20px;box-sizing:border-box;">
+    <div style="background:#1a1a1a;border:2px solid #f5c542;border-radius:16px;padding:25px 20px;max-width:340px;width:100%;text-align:center;">
+        <h3 style="color:#f5c542;margin-top:0;">⭐ كيف كانت تجربتك؟</h3>
+        <p style="opacity:0.8;font-size:14px;color:white;">رأيك يهمنا كثيرًا 🍯</p>
+        <div id="popupStars" style="font-size:34px;margin:15px 0;cursor:pointer;color:#f5c542;">☆☆☆☆☆</div>
+        <input id="popupName" placeholder="اسمك (اختياري)" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;box-sizing:border-box;">
+        <textarea id="popupComment" placeholder="اكتب ملاحظاتك هنا..." style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;box-sizing:border-box;min-height:70px;"></textarea>
+        <button class="buy" onclick="submitPopupReview()">إرسال التقييم</button>
+        <button onclick="closeReviewPopup()" style="background:none;border:none;color:#999;margin-top:10px;cursor:pointer;">لاحقًا</button>
+    </div>
  </div>
 <div class="overlay">
  <a id="floatingWhatsapp" href="https://wa.me/96181723480" target="_blank">
