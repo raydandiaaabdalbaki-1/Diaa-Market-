@@ -1147,24 +1147,28 @@ function checkout(){
  
 
 function searchProducts() {
-    let searchInput = document.getElementById("searchInput"); // تأكد من مطابقة الـ ID الخاص بحقل البحث لديك
+    let searchInput = document.getElementById("searchInput");
     if (!searchInput) return;
     
+    // أخذ النص الذي كتبه المستخدم وتنظيفه
     let query = cleanSearchText(searchInput.value);
 
-    // تصفية المنتجات بناءً على النص المنظف
-    let filteredProducts = products.filter(p => {
-        let cleanName = cleanSearchText(p.name);
-        let cleanDesc = cleanSearchText(p.desc || "");
+    // البحث في جميع بطاقات المنتجات المعروضة
+    let allCards = document.querySelectorAll("#homeProducts .card, #honeyProducts .card, #pollenProducts .card, #royalProducts .card");
+
+    allCards.forEach(card => {
+        // تنظيف النص الموجود داخل كل بطاقة (اسم المنتج) لمقارنته بالبحث
+        let cardText = cleanSearchText(card.innerText);
         
-        // التحقق مما إذا كان النص المدخل موجوداً في الاسم أو الوصف
-        return cleanName.includes(query) || cleanDesc.includes(query);
+        // إذا كان النص المنظف يحتوي على كلمة البحث، نظهر الكرت، وإلا نخفيه
+        if (cardText.includes(query)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
     });
-
-    // عرض المنتجات المفلترة
-    renderFilteredProducts(filteredProducts);
 }
-
+ 
 
 function showToast(message){
     let t = document.getElementById("toast");
