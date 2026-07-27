@@ -751,10 +751,13 @@ cursor:pointer;
 </div>
     
 <div id="home" class="section active">
-    <div class="searchContainer">
-        <input id="searchInput" type="text" placeholder="ابحث عن المنتج..." oninput="searchProducts()" style="width: 90%; padding: 14px 20px; font-size: 16px; border-radius: 30px; border: 2px solid #f5c542; background: white; color: black; outline: none; display: block; margin: 15px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-
-    </div>
+        <div class="searchContainer">
+        <form onsubmit="event.preventDefault(); searchProducts();" style="display: flex; justify-content: center; align-items: center; gap: 8px; max-width: 90%; margin: 15px auto;">
+            <input id="searchInput" type="search" enterkeyhint="search" placeholder="ابحث عن المنتج..." oninput="searchProducts()" style="width: 100%; padding: 14px 20px; font-size: 16px; border-radius: 30px; border: 2px solid #f5c542; background: white; color: black; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <button type="submit" style="background: #f5c542; border: none; border-radius: 50%; width: 50px; height: 50px; min-width: 50px; font-size: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center;">🔍</button>
+        </form>
+        </div>
+ 
     <div id="cartBadge">🛒 السلة: <span id="cartCount">0</span></div>
     <div id="homeProducts"></div>
 </div>
@@ -1596,7 +1599,7 @@ window.addEventListener("load", function() {
             splash.classList.add("splashHidden");
             setTimeout(function(){ splash.style.display = "none"; }, 600);
         }
-    }, 1000);
+    }, 750);
 });
  let popupRating = 0;
 
