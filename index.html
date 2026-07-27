@@ -764,7 +764,10 @@ cursor:pointer;
 <div id="productPage">  
     <button class="top-back" onclick="back()">⬅</button>  
     <div class="productWrap">  
-        <img id="pImg" class="productImg" onclick="openFullscreenImage()" style="cursor:pointer;">
+        <div class="pGalleryWrap">
+    <div class="pGallery" id="pGallery" onscroll="updateActiveDot()"></div>
+    <div class="pDots" id="pDots"></div>
+        </div>
         <div class="productName" id="pName"></div>  
         <div class="productDesc" id="pDesc"></div>  
         <div class="productPrice"><span id="pPrice"></span><span style="font-size:26px;font-weight:bold;color:#f5a623;">$</span></div>
@@ -779,9 +782,9 @@ cursor:pointer;
     </div>
 </div>
 </div>
-<div id="imageFullscreen" onclick="closeFullscreenImage()">
-    <button class="closeFullscreen">✕</button>
-    <img id="fullscreenImg" src="">
+<div id="imageFullscreen">
+    <button class="closeFullscreen" onclick="closeFullscreenImage()">✕</button>
+    <div class="fsGallery" id="fsGallery"></div>
 </div>
 <script>
 // دالة عرض الأقسام والتنقل
@@ -809,7 +812,8 @@ let editingId = null;
 let products = [];
 let qtyValue = 1;  
 let name="", price=0, img=""; 
-
+let currentImages = [];
+let fsIndex = 0;
 function renderProducts(){
     document.getElementById("homeProducts").innerHTML = "";
     document.getElementById("adminProducts").innerHTML = "";
@@ -818,13 +822,16 @@ function renderProducts(){
     document.getElementById("royalProducts").innerHTML = "";
 
     products.forEach(p => {
-        let card = `
-        <div class="card" onclick="openProduct('${p.name}',${p.price},'${p.img}','${p.desc}')">
-            <h3>${p.name}</h3>
-            <p>${p.price}$</p>
-            <img src="${p.img}">
-        </div>
-        `;
+        let imagesArr = (p.images && p.images.length > 0) ? p.images : [p.img];
+let galleryImgs = imagesArr.map((im,i)=> `<img src="${im}">`).join("");
+
+let card = `
+<div class="card" onclick="openProductById('${p.id}')">
+    <div class="cardGallery" onclick="event.stopPropagation()">${galleryImgs}</div>
+    <h3>${p.name}</h3>
+    <p>${p.price}$</p>
+</div>
+`;
         
         document.getElementById("adminProducts").innerHTML += `
         <div class="card">
@@ -849,19 +856,42 @@ function renderProducts(){
     });
 } 
   
-function openProduct(n,p,i,d){  
-    name=n; price=p; img=i; qtyValue=1;  
-    document.getElementById("pName").innerText=n;  
-    document.getElementById("pPrice").innerText=p;  
-    document.getElementById("pImg").src=i;  
-    document.getElementById("pDesc").innerText=d;  
-    document.getElementById("qty").innerText=1;  
-    document.getElementById("productPage").style.display="block";  
-    document.querySelector(".nav").style.display="none";  
-}  
-  function openFullscreenImage(){
-    document.getElementById("fullscreenImg").src = document.getElementById("pImg").src;
+function openProductById(id){
+    let p = products.find(pr => pr.id == id);
+    if(!p) return;
+    name = p.name; price = p.price; img = p.img; qtyValue = 1;
+    currentImages = (p.images && p.images.length > 0) ? p.images : [p.img];
+
+    document.getElementById("pName").innerText = p.name;
+    document.getElementById("pPrice").innerText = p.price;
+    document.getElementById("pDesc").innerText = p.desc;
+    document.getElementById("qty").innerText = 1;
+
+    renderPGallery();
+
+    document.getElementById("productPage").style.display = "block";
+    document.querySelector(".nav").style.display = "none";
+}
+
+function renderPGallery(){
+    let gallery = document.getElementById("pGallery");
+    let dots = document.getElementById("pDots");
+    gallery.innerHTML = currentImages.map((im,i)=> `<img src="${im}" onclick="openFullscreenImage(${i})">`).join("");
+    dots.innerHTML = currentImages.map((im,i)=> `<span class="dot ${i===0?'active':''}"></span>`).join("");
+    gallery.scrollLeft = 0;
+}
+
+function updateActiveDot(){
+    let gallery = document.getElementById("pGallery");
+    let idx = Math.round(gallery.scrollLeft / gallery.offsetWidth);
+    document.querySelectorAll("#pDots .dot").forEach((d,i)=> d.classList.toggle("active", i===idx));
+ }
+  function openFullscreenImage(index){
+    fsIndex = index || 0;
+    let fsGallery = document.getElementById("fsGallery");
+    fsGallery.innerHTML = currentImages.map(im => `<img src="${im}">`).join("");
     document.getElementById("imageFullscreen").style.display = "flex";
+    setTimeout(()=>{ fsGallery.scrollLeft = fsIndex * fsGallery.offsetWidth; }, 0);
 }
 function closeFullscreenImage(){
     document.getElementById("imageFullscreen").style.display = "none";
