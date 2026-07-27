@@ -1513,7 +1513,31 @@ window.addEventListener("load", function(){
     }
          }
  
- 
+ // 1. الاستماع لزر الرجوع الخاص بالهاتف (أندرويد / آيفون سوايب)
+window.addEventListener('popstate', function (event) {
+    let checkoutPage = document.getElementById('checkoutPage');
+    let productDetails = document.getElementById('productDetails'); // أو اسم div تفاصيل المنتج لديك
+
+    // إذا كانت صفحة الشراء مفتوحة، نغلقها فقط
+    if (checkoutPage && checkoutPage.style.display !== 'none') {
+        checkoutPage.style.display = 'none';
+        return;
+    }
+
+    // إذا كانت صفحة تفاصيل المنتج مفتوحة، نغلقها ونعود للمتجر
+    if (productDetails && productDetails.style.display !== 'none') {
+        productDetails.style.display = 'none';
+        return;
+    }
+});
+
+// 2. تحديث دوال الفتح لإضافة خطوة في سجل المتصفح
+// ضع هذا السطر داخل دالة فتح الشك أوت (مثلاً openCheckout):
+// history.pushState({ page: 'checkout' }, '');
+
+// وضعه أيضاً داخل دالة فتح تفاصيل المنتج (مثلاً showProductDetails):
+// history.pushState({ page: 'product' }, '');
+         
 </script>
 
 <div id="deleteConfirm">  
