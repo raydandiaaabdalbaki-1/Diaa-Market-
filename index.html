@@ -933,13 +933,13 @@ function updateActiveDot(){
     setTimeout(()=>{ fsGallery.scrollLeft = fsIndex * fsGallery.offsetWidth; }, 0);
   }
  
-function closeFullscreenImage(){
-    document.getElementById("imageFullscreen").style.display = "none";
+function closeFullscreenImage() {
+    history.back();
+}
+ function back() {
+    history.back();
  }
-function back(){  
-    document.getElementById("productPage").style.display="none";  
-    document.querySelector(".nav").style.display="flex";  
-}  
+ 
 
 function qty(x){  
     qtyValue += x;  
@@ -1180,8 +1180,10 @@ function editProduct(id){
 }
  
 
-function closeEditPage(){ document.getElementById("editPage").style.display = "none"; }
-
+function closeEditPage() {
+    history.back();
+                  }
+     
 async function saveEdit(){
     if(!supabaseClient) return;
     let name = document.getElementById("editName").value;
@@ -1201,7 +1203,10 @@ async function saveEdit(){
     }
 }
 
-function closeCheckout(){ document.getElementById("checkoutPage").style.display = "none"; }
+function closeCheckout() {
+    history.back();
+}
+ 
 
  async function confirmOrder(){
     let btn = document.getElementById("confirmOrderBtn");
