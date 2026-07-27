@@ -108,16 +108,21 @@ header{
 }  
   
 .top-back{  
-    position:absolute;  
-    top:15px;  
+    position:fixed;  
+    bottom:115px;  
     left:15px;  
-    width:45px;  
-    height:45px;  
-    border-radius:50%;  
-    border:none;  
-    background:#222;  
+    padding:8px 16px;  
+    border-radius:20px;  
+    border:1px solid rgba(255, 255, 255, 0.2);  
+    background:#222222;  
     color:white;  
+    font-size:14px;
+    font-weight:bold;
+    z-index:10000;
+    box-shadow:0 4px 12px rgba(0,0,0,0.25);
+    cursor:pointer;
 }
+ 
   
 .productFooter{
     position:fixed;
@@ -736,7 +741,8 @@ cursor:pointer;
     </div>  
 </div> 
 
-<div id="checkoutPage" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:white;color:black;z-index:99999;overflow:auto;padding:20px;box-sizing:border-box;">
+<div id="checkoutPage" style="display:none;position:fixed;top:0;left:0;width:100%;height:100vh;background:white;color:black;z-index:99999;overflow:auto;padding:20px;padding-bottom:120px;box-sizing:border-box;">
+ 
     <button class="top-back" onclick="closeCheckout()">⬅</button>
     <h2 style="text-align:center;color:#f5c542;margin-top:50px;">إتمام الطلب</h2>
     <div class="card" style="background:white;color:black;box-shadow:0 2px 10px rgba(0,0,0,.2);">
@@ -758,7 +764,8 @@ cursor:pointer;
     <div class="card" id="orderSummary" style="background:white;color:black;box-shadow:0 2px 10px rgba(0,0,0,.2);">
         <h3 style="color:#f5c542;">ملخص الطلب</h3>
     </div>
-    <button class="buy" id="confirmOrderBtn" onclick="confirmOrder()">✅ تأكيد الطلب</button>
+ <button class="buy" id="confirmOrderBtn" style="margin-bottom:40px;" onclick="confirmOrder()">✅ تأكيد الطلب</button>
+ 
 </div>
 
 <div id="productPage">  
