@@ -815,8 +815,15 @@ cursor:pointer;
     <div class="fsGallery" id="fsGallery"></div>
 </div>
 <script>
-// دالة عرض الأقسام والتنقل
+let initialLoad = true;
 function show(id, tabId){
+    if(!initialLoad) {
+        history.pushState({ page: id, tabId: tabId }, null, window.location.href);
+    } else {
+        history.replaceState({ page: id, tabId: tabId }, null, window.location.href);
+        initialLoad = false;
+    }
+    
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     let target = document.getElementById(id);
     if(target) target.style.display = 'block';
@@ -827,6 +834,7 @@ function show(id, tabId){
         if(tab) tab.classList.add('activeTab');
     }
 }
+ 
 
 // الروابط الحقيقية والربط المباشر بقاعدة البيانات (تم إصلاح الحرف الصغير لضمان استقرار الكود)
 
@@ -885,6 +893,7 @@ let card = `
 } 
   
 function openProductById(id){
+    history.pushState({ popup: 'product' }, null, window.location.href);
     let p = products.find(pr => pr.id == id);
     if(!p) return;
     name = p.name; price = p.price; img = p.img; qtyValue = 1;
@@ -900,6 +909,7 @@ function openProductById(id){
     document.getElementById("productPage").style.display = "block";
     document.querySelector(".nav").style.display = "none";
 }
+ 
 
 function renderPGallery(){
     let gallery = document.getElementById("pGallery");
@@ -915,12 +925,14 @@ function updateActiveDot(){
     document.querySelectorAll("#pDots .dot").forEach((d,i)=> d.classList.toggle("active", i===idx));
  }
   function openFullscreenImage(index){
+    history.pushState({ popup: 'fullscreen' }, null, window.location.href);
     fsIndex = index || 0;
     let fsGallery = document.getElementById("fsGallery");
     fsGallery.innerHTML = currentImages.map(im => `<img src="${im}">`).join("");
     document.getElementById("imageFullscreen").style.display = "flex";
     setTimeout(()=>{ fsGallery.scrollLeft = fsIndex * fsGallery.offsetWidth; }, 0);
-}
+  }
+ 
 function closeFullscreenImage(){
     document.getElementById("imageFullscreen").style.display = "none";
  }
@@ -991,11 +1003,13 @@ function removeItem(i){
   
 function checkout(){
     if(cart.length == 0){ showToast("السلة فارغة"); return; }
+    history.pushState({ popup: 'checkout' }, null, window.location.href);
     document.getElementById("checkoutPage").style.display = "block";
     let summary = "";
     cart.forEach(i=> summary += `<p>${i.name} × ${i.qty}</p>`);
     document.getElementById("orderSummary").innerHTML = `<h3 style="color:#f5c542;">ملخص الطلب</h3>${summary}`;
 }
+ 
 
 function searchProducts(){
     let text = document.getElementById("searchBox").value.toLowerCase();
@@ -1155,6 +1169,7 @@ function checkAdmin(){
 }
       
 function editProduct(id){
+    history.pushState({ popup: 'edit' }, null, window.location.href);
     let product = products.find(p => p.id == id);
     editingId = id;
     document.getElementById("editName").value = product.name;
@@ -1163,6 +1178,7 @@ function editProduct(id){
     document.getElementById("editCategory").value = product.category;
     document.getElementById("editPage").style.display = "block";
 }
+ 
 
 function closeEditPage(){ document.getElementById("editPage").style.display = "none"; }
 
@@ -1513,31 +1529,45 @@ window.addEventListener("load", function(){
     }
          }
  
- // 1. الاستماع لزر الرجوع الخاص بالهاتف (أندرويد / آيفون سوايب)
-window.addEventListener('popstate', function (event) {
-    let checkoutPage = document.getElementById('checkoutPage');
-    let productDetails = document.getElementById('productDetails'); // أو اسم div تفاصيل المنتج لديك
+ window.addEventListener('popstate', function(event) {
+    let checkoutPage = document.getElementById("checkoutPage");
+    let productPage = document.getElementById("productPage");
+    let editPage = document.getElementById("editPage");
+    let imageFullscreen = document.getElementById("imageFullscreen");
 
-    // إذا كانت صفحة الشراء مفتوحة، نغلقها فقط
-    if (checkoutPage && checkoutPage.style.display !== 'none') {
-        checkoutPage.style.display = 'none';
-        return;
-    }
-
-    // إذا كانت صفحة تفاصيل المنتج مفتوحة، نغلقها ونعود للمتجر
-    if (productDetails && productDetails.style.display !== 'none') {
-        productDetails.style.display = 'none';
-        return;
+    // 1. إغلاق النوافذ المنبثقة بالترتيب
+    if (imageFullscreen && imageFullscreen.style.display === "flex") {
+        imageFullscreen.style.display = "none";
+    } else if (checkoutPage && checkoutPage.style.display === "block") {
+        checkoutPage.style.display = "none";
+    } else if (editPage && editPage.style.display === "block") {
+        editPage.style.display = "none";
+    } else if (productPage && productPage.style.display === "block") {
+        productPage.style.display = "none";
+        document.querySelector(".nav").style.display = "flex"; // إعادة شريط التنقل السفلي
+    } 
+    // 2. التنقل بين الأقسام (الرئيسية، السلة، العسل، الخ)
+    else if (event.state && event.state.page) {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        let target = document.getElementById(event.state.page);
+        if(target) target.style.display = 'block';
+        
+        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('activeTab'));
+        if(event.state.tabId) {
+            let tab = document.getElementById(event.state.tabId);
+            if(tab) tab.classList.add('activeTab');
+        }
+    } 
+    // 3. العودة للرئيسية كحل افتراضي أخير
+    else {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById('home').style.display = 'block';
+        document.querySelectorAll('.nav button').forEach(b => b.classList.remove('activeTab'));
+        let tabHome = document.getElementById('tab-home');
+        if(tabHome) tabHome.classList.add('activeTab');
     }
 });
-
-// 2. تحديث دوال الفتح لإضافة خطوة في سجل المتصفح
-// ضع هذا السطر داخل دالة فتح الشك أوت (مثلاً openCheckout):
-// history.pushState({ page: 'checkout' }, '');
-
-// وضعه أيضاً داخل دالة فتح تفاصيل المنتج (مثلاً showProductDetails):
-// history.pushState({ page: 'product' }, '');
-         
+ 
 </script>
 
 <div id="deleteConfirm">  
