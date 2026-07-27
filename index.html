@@ -729,6 +729,21 @@ cursor:pointer;
         <div id="ordersList"></div>
     </div>
 <div id="reviewsAdmin" style="display:none;">
+     <div class="card" style="border: 2px solid #f5c542; text-align: center; background: #1a1a1a;">
+        <h3 style="color: #f5c542; margin-top: 5px;">⚙️ حالة نظام التقييمات</h3>
+        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">التحكم بظهور نافذة التقييم للزوار وقسم الآراء.</p>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="btnEnableReviews" onclick="toggleReviewSystem(true)" style="flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #25D366; color: white; opacity: 0.5; pointer-events: none;">
+                ✅ مفعل
+            </button>
+            <button id="btnDisableReviews" onclick="toggleReviewSystem(false)" style="flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #333; color: white;">
+                ⏸️ تعطيل مؤقت
+            </button>
+        </div>
+    </div>
+    <br>
+ 
     <div id="pendingReviewsList"></div>
 </div>
 </div>
@@ -1382,12 +1397,35 @@ async function submitPopupReview(){
     closeReviewPopup();
 }
 
-window.addEventListener("load", function(){
-    if(localStorage.getItem("reviewPopupShown") === "true") return;
-    setTimeout(function(){
-        document.getElementById("reviewPopup").style.display = "flex";
-    }, 90000);
+window.addEventListener("load", async function(){
+    if(!supabaseClient) return;
+
+    // 1. جلب حالة نظام التقييم من قاعدة البيانات
+    const { data } = await supabaseClient.from('settings').select('reviews_enabled').eq('id', 1).single();
+    
+    if (data) {
+        // 2. تحديث شكل الأزرار في لوحة الإدارة تلقائياً عند فتح الصفحة
+        let btnEnable = document.getElementById("btnEnableReviews");
+        let btnDisable = document.getElementById("btnDisableReviews");
+        if(btnEnable && btnDisable) {
+            if(data.reviews_enabled) {
+                btnEnable.style.opacity = "0.5"; btnEnable.style.pointerEvents = "none"; btnEnable.style.background = "#25D366";
+                btnDisable.style.opacity = "1"; btnDisable.style.pointerEvents = "auto"; btnDisable.style.background = "#333";
+            } else {
+                btnDisable.style.opacity = "0.5"; btnDisable.style.pointerEvents = "none"; btnDisable.style.background = "#e74c3c";
+                btnEnable.style.opacity = "1"; btnEnable.style.pointerEvents = "auto"; btnEnable.style.background = "#222";
+            }
+        }
+
+        // 3. إظهار النافذة للزائر فقط إذا كان النظام مفعلاً في قاعدة البيانات
+        if (data.reviews_enabled && localStorage.getItem("reviewPopupShown") !== "true") {
+            setTimeout(function(){
+                document.getElementById("reviewPopup").style.display = "flex";
+            }, 90000);
+        }
+    }
 });
+ 
 async function loadPendingReviews(){
     if(!supabaseClient) return;
     const { data } = await supabaseClient.from('reviews').select('*').eq('approved', false).order('created_at', { ascending: false });
@@ -1438,6 +1476,44 @@ async function rejectReview(id){
 window.addEventListener("load", function(){
     setTimeout(loadApprovedReviews, 500);
 });
+ async function toggleReviewSystem(isEnable) {
+    let btnEnable = document.getElementById("btnEnableReviews");
+    let btnDisable = document.getElementById("btnDisableReviews");
+
+    // 1. تغيير شكل الأزرار فوراً
+    if(isEnable) {
+        btnEnable.style.opacity = "0.5";
+        btnEnable.style.pointerEvents = "none";
+        btnEnable.style.background = "#25D366";
+        
+        btnDisable.style.opacity = "1";
+        btnDisable.style.pointerEvents = "auto";
+        btnDisable.style.background = "#333";
+    } else {
+        btnDisable.style.opacity = "0.5";
+        btnDisable.style.pointerEvents = "none";
+        btnDisable.style.background = "#e74c3c"; 
+        
+        btnEnable.style.opacity = "1";
+        btnEnable.style.pointerEvents = "auto";
+        btnEnable.style.background = "#222"; 
+    }
+
+    // 2. تحديث الحالة في قاعدة البيانات ليراها جميع الزوار
+    if(!supabaseClient) return;
+    const { error } = await supabaseClient
+        .from('settings')
+        .update({ reviews_enabled: isEnable })
+        .eq('id', 1);
+
+    if(error) {
+        showToast("حدث خطأ في الاتصال بقاعدة البيانات");
+    } else {
+        showToast(isEnable ? "تم تفعيل نظام التقييمات للزوار ✓" : "تم إيقاف نظام التقييمات مؤقتاً ⏸️");
+    }
+         }
+ 
+ 
 </script>
 
 <div id="deleteConfirm">  
