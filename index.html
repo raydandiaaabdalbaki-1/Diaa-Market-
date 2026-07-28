@@ -8,8 +8,11 @@
     await OneSignal.init({
       appId: "cc956827-a4d8-4b34-8221-7863d35238c1",
     });
+    // أمر إجبار إظهار شريط طلب الإشعارات للزائر فور فتح الموقع
+    OneSignal.Slidedown.promptPush();
   });
 </script>
+ 
  
 <meta charset="UTF-8">  
  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
