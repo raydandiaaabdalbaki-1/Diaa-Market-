@@ -7,9 +7,11 @@
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "cc956827-a4d8-4b34-8221-7863d35238c1",
+      safari_web_id: "web.onesignal.auto.44daf2d6-544c-403f-a3b6-3ab51abe3e37",
+      notifyButton: {
+        enable: true,
+      },
     });
-    // أمر إجبار إظهار شريط طلب الإشعارات للزائر فور فتح الموقع
-    OneSignal.Slidedown.promptPush();
   });
 </script>
  
