@@ -1334,7 +1334,7 @@ function closeDeleteConfirm(){ document.getElementById("deleteConfirm").style.di
 
 function checkAdmin(){
     let pass = document.getElementById("adminPass").value;
-    if(pass === "1234"){
+    if(pass === "werty1234@#$werty@#$"){
         document.getElementById("adminLogin").style.display="none";
         document.getElementById("adminPanel").style.display="block";
         showAdminSection("productsAdmin", "adminProductsTab");
@@ -1596,7 +1596,7 @@ function secretAdmin(){
     clearTimeout(adminTimeout); 
     adminClicks++;
     
-    if(adminClicks >= 5){
+    if(adminClicks >= 7){
         let adminTab = document.getElementById("tab-admin");
         if(adminTab) {
             adminTab.style.display = "block"; 
@@ -1605,7 +1605,7 @@ function secretAdmin(){
         }
         adminClicks = 0;
     }
-    adminTimeout = setTimeout(()=>{ adminClicks = 0; }, 3000);
+    adminTimeout = setTimeout(()=>{ adminClicks = 0; }, 2000);
 }
 
 // تشغيل فوري حاسم للتطبيق بالأسفل مباشرة
